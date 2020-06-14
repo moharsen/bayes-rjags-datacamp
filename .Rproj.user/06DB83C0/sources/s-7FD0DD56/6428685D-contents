@@ -232,3 +232,24 @@ ggplot(sleep_chains[sleep_chains$iter<101,], aes(x = iter, y = m)) +
 
 Note that the longitudinal behavior of the chain appears quite random and that the trend remains relatively constant. This is a good thing. It indicates that the Markov chain (likely) converges quickly to the posterior distribution of m.
 
+### Markov chain density plots
+
+Whereas a trace plot captures a Markov chain's longitudinal behavior, a density plot illustrates the final distribution of the chain values. In turn, the density plot provides an approximation of the posterior model. You will construct and examine density plots of the m Markov chain below.
+
+**Instructions**
+
++ Apply plot() to sleep_sim with trace = FALSE to construct density plots for the m and s chains.
++ Apply ggplot() to sleep_chains to re-construct a density plot of the m chain.
+
+```{r}
+# Use plot() to construct density plots of the m and s chains
+plot(sleep_sim, trace = FALSE)
+
+# Use ggplot() to construct a density plot of the m chain
+ggplot(sleep_chains, aes(x = m)) + 
+    geom_density()
+```
+Remember, these plots _approximate_ the posterior models of m and s
+
+
+

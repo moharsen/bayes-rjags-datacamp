@@ -1,0 +1,2 @@
+"0","# Use plot() to construct density plots of the m and s chains"
+"0","plot(sleep_sim, trace = FALSE)"

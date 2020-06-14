@@ -1,0 +1,4 @@
+"0",""
+"0","# Use ggplot() to construct a density plot of the m chain"
+"0","ggplot(sleep_chains, aes(x = m)) + "
+"0","    geom_density()"
