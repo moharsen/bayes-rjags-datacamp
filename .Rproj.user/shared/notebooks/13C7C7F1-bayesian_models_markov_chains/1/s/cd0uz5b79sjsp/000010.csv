@@ -1,0 +1,2 @@
+"0","ggplot(samples, aes(x = prior_s)) + "
+"0","    geom_density()"

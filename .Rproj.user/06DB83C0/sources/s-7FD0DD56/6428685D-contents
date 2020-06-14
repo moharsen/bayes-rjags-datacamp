@@ -56,9 +56,38 @@ $Y_i \sim N(m, s^2)$
 $m \sim N(50, 25^2)$
 $s \sim Unif(0,200)$
 
+```{r}
+library(ggplot2)
+```
+
+
 ## Normal-Normal priors
 In the first step of your Bayesian analysis, you'll simulate the following prior models for parameters m and s: 
-Use rnorm(n, mean, sd) to sample 10,000 draws from the m prior. Assign the output to prior_m.
-Use runif(n, min, max) to sample 10,000 draws from the s prior. Assign the output to prior_s.
-After storing these results in the samples data frame, construct a density plot of the prior_m samples and a density plot of the prior_s samples.
+
++ Use rnorm(n, mean, sd) to sample 10,000 draws from the m prior. Assign the output to prior_m.
++ Use runif(n, min, max) to sample 10,000 draws from the s prior. Assign the output to prior_s.
++ After storing these results in the samples data frame, construct a density plot of the prior_m samples and a density plot of the prior_s samples.
+
+
+```{r}
+# Take 10000 samples from the m prior
+prior_m <- rnorm(n=10000, mean=50, sd=25)
+
+# Take 10000 samples from the s prior    
+prior_s <- runif(n=10000, min=0, max=200)
+
+# Store samples in a data frame
+samples <- data.frame(prior_m, prior_s)
+
+# Density plots of the prior_m & prior_s samples    
+ggplot(samples, aes(x = prior_m)) + 
+    geom_density()
+ggplot(samples, aes(x = prior_s)) + 
+    geom_density()
+```
+The distributions of these random samples approximate the features of your Normal prior for m and Uniform prior for s.
+
+
+
+
 
