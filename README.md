@@ -1,0 +1,1 @@
+This is my attempt to lear bayes, rJags and rmardown editing using the [datacamp course](https://campus.datacamp.com/courses/bayesian-modeling-with-rjags) on rjags.
