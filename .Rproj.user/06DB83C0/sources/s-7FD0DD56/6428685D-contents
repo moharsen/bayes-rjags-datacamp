@@ -281,6 +281,31 @@ plot(sleep_sim_multi, density = FALSE)
 ```
 The most important thing to notice here is the similarity and stability among the 4 parallel chains. This provides some reassurance about the quality and consistency of our Markov chain simulation
 
+### Naive standard errors
 
+The mean of the m Markov chain provides an estimate of the posterior mean of m. The naive standard error provides a measure of the potential error in this estimate. In turn, we can use this measure to determine an appropriate chain length. For example, suppose your goal is to estimate the posterior mean of m within a standard error of 0.1 ms. If your observed naive standard error exceeds this target, no problem! Simply run a longer chain - the error in using a Markov chain to approximate a posterior tends to decrease as chain length increases. 
+
+**Instructions**
+
++ SIMULATE 1,000 draws from the posterior model of m and s. Store these in sleep_sim_1.
++ Obtain a summary() of the sleep_sim_1 chains.
++ If the naive standard error of the m chain exceeds the 0.1 target, adjust your simulation: try using either 500 draws or 10,000 draws (instead of 1,000). Store the results in sleep_sim_2.
++ Obtain a summary() of the sleep_sim_2 chains. Confirm that your new simulation meets the criterion. If not, return to the previous step & repeat!
+
+```{r}
+# SIMULATE the posterior    
+sleep_sim_1 <- coda.samples(model = sleep_jags, variable.names = c("m", "s"), n.iter = 1000)
+
+# Summarize the m and s chains of sleep_sim_1
+summary(sleep_sim_1)
+
+# RE-SIMULATE the posterior    
+sleep_sim_2 <- coda.samples(model = sleep_jags, variable.names = c("m", "s"), n.iter = 10000)
+
+# Summarize the m and s chains of sleep_sim_2
+summary(sleep_sim_2)
+```
+
+You've proved to yourself that if the standard errors associated with your Markov chain are too big, simply increase the number of iterations. In general, naive standard error will decrease as the chain length increases. 
 
 
