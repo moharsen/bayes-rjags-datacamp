@@ -1,0 +1,4 @@
+"0",""
+"0","# Use ggplot() to construct a trace plot of the m chain"
+"0","ggplot(sleep_chains, aes(x = iter, y = m)) + "
+"0","    geom_line()"

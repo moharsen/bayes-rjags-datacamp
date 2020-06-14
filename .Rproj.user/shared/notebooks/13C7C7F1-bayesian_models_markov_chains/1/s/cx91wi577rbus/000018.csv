@@ -1,0 +1,4 @@
+"0",""
+"0","# Trace plot the first 100 iterations of the m chain"
+"0","ggplot(sleep_chains[sleep_chains$iter<101,], aes(x = iter, y = m)) + "
+"0","    geom_line()"

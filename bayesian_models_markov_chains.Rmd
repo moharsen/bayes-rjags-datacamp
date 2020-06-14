@@ -201,3 +201,32 @@ Your posterior model is more narrow and lies almost entirely above 0, thus you'r
 
 ## Markov chains
 
+The sample of m values in `sleep_sim` is a dependent Markov chain, the distribution of which converges to the posterior. You will examine the contents of `sleep_sim` and, to have finer control over your analysis, store the contents in a data frame.
+
+```{r}
+# Check out the head of sleep_sim
+head(sleep_sim)
+
+# Store the chains in a data frame
+sleep_chains <- data.frame(as.matrix(sleep_sim), iter=1:10000)
+
+# Check out the head of sleep_chains
+head(sleep_chains)
+```
+Next, you'll visualize the contents of these Markov chains. 
+
+```{r}
+# Use plot() to construct trace plots of the m and s chains
+plot(sleep_sim, density = FALSE)
+
+# Use ggplot() to construct a trace plot of the m chain
+ggplot(sleep_chains, aes(x = iter, y = m)) + 
+    geom_line()
+
+# Trace plot the first 100 iterations of the m chain
+ggplot(sleep_chains[sleep_chains$iter<101,], aes(x = iter, y = m)) + 
+    geom_line()
+```
+Note that the longitudinal behavior of the chain appears quite random and that the trend remains relatively constant. This is a good thing - it indicates that the Markov chain (likely) converges quickly to the posterior distribution of m.
+
+
