@@ -59,6 +59,8 @@ $s \sim Unif(0,200)$
 ```{r message=FALSE}
 library(ggplot2)
 library(rjags)
+library(tinytex)
+options(tinytex.verbose=TRUE)
 ```
 
 
@@ -146,7 +148,7 @@ In this series of exercises, you'll __define__, __compile__, and __simulate__ yo
 **Step 1: Define**
 DEFINE your Bayesian model and store the model string as `sleep_model`. In doing so, note that:
 
-+ `dnorm(a, b)` defines a $N(a,b−1)$ model with precision (ie. inverse variance) $b$.
++ `dnorm(a, b)` defines a $N(a,b - 1)$ model with precision (ie. inverse variance) $b$.
 + `dunif(a,b)` defines a $Unif(a,b)$ model.
 + The model of $Y_i$ depends upon $m$ and $s$. The number of subjects $i$ is defined by `length(Y)`.
 
@@ -227,6 +229,6 @@ ggplot(sleep_chains, aes(x = iter, y = m)) +
 ggplot(sleep_chains[sleep_chains$iter<101,], aes(x = iter, y = m)) + 
     geom_line()
 ```
-Note that the longitudinal behavior of the chain appears quite random and that the trend remains relatively constant. This is a good thing - it indicates that the Markov chain (likely) converges quickly to the posterior distribution of m.
 
+Note that the longitudinal behavior of the chain appears quite random and that the trend remains relatively constant. This is a good thing. It indicates that the Markov chain (likely) converges quickly to the posterior distribution of m.
 

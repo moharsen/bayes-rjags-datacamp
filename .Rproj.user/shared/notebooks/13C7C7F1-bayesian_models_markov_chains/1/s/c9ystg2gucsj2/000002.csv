@@ -1,2 +1,3 @@
 "0","library(ggplot2)"
 "0","library(rjags)"
+"0","library(tinytex)"
