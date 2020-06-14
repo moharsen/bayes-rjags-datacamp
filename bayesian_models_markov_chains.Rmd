@@ -1,0 +1,61 @@
+---
+title: "Bayesian models and Markov chains"
+author: "Mohar Sen"
+date: "6/14/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Research topic: Sleep deprivation
+
+**Research Question**  
+How does sleep deprivation impact reaction time?
+
+**The Study**  
+
+* measure reaction time on Day 0
+* restrict sleep to 3 hours per night
+* measure reaction time on Day 3
+* measure the change in reaction time  
+
+For subject $i$, let $Y_i$ be the change in reaction time (in ms) after 3 sleep deprived nights. Of course, people react differently to sleep deprivation. It's reasonable to assume that $Y_i$ are Normally distributed around some average $m$ with standard deviation $s$
+  
+$Y_i$ = change in reaction time(ms) for subject $i$
+
+**Assume**  
+$Y_i$ are Normally distributed around some average change in reaction time m with
+standard deviation $s$.  
+
+$Y_i \sim N(m, s^2)$
+
+__Prior model for parameter $m$__  
+$Y_i$ = change in reaction time (ms)  
+$Y_i \sim N(m, s^2)$  
+$m = average Y_i$ 
+
+__Prior information:__
+
+* with normal sleep, average reaction time is ~250 ms
+* expect average to increase by ~50 m
+* average is unlikely to decrease & unlikely to increase by more than ~150 ms
+
+Thus, m ~ N(50, 25^2)
+
+Also, 
+* s>0
+* with normal sleep, s.d. in reaction times is ~30 ms
+* s is equally likely to be anywhere from 0 to 200 ms
+
+Thus, s ~ Unif(0,200)
+
+Therefore,
+$Y_i \sim N(m, s^2)$
+$m \sim N(50, 25^2)$
+$s \sim Unif(0,200)$
+
+## Normal-Normal priors
+In the first step of your Bayesian analysis, you'll simulate the following prior models for parameters m and s: 
+

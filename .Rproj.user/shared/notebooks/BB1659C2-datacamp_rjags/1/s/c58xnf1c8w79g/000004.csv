@@ -1,0 +1,3 @@
+"0","# Density plots of p_grid grouped by poll_result"
+"0","ggplot(likelihood_sim, aes(x = p_grid, y = poll_result, group = poll_result, fill = poll_result==6)) + "
+"0","    geom_density_ridges()"

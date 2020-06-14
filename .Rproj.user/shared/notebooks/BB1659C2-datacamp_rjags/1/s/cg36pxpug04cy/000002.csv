@@ -1,0 +1,8 @@
+"0","### DEFINE the model"
+"0","vote_model <- ""model{"
+"0","    # Likelihood model for X"
+"0","    X ~ dbin(p,n)"
+"0","    "
+"0","    # Prior model for p"
+"0","    p ~ dbeta(a,b)"
+"0","}"""
