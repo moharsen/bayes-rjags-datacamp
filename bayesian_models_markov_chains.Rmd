@@ -87,7 +87,50 @@ ggplot(samples, aes(x = prior_s)) +
 ```
 The distributions of these random samples approximate the features of your Normal prior for m and Uniform prior for s.
 
+## Sleep study data
 
+Researchers enrolled 18 subjects in a sleep deprivation study. Their observed `sleep_study` data are loaded in the workspace. These data contain the `day_0` reaction times and day_3 reaction times after 3 sleep deprived nights for each subject.
 
+You will define and explore `diff_3`, the observed difference in reaction times for each subject. This will require the `mutate()` & `summarize()` functions. For example, the following would add variable `day_0_s`, `day_0` reaction times in seconds, to sleep_study:
+```r
+sleep_study <- sleep_study %>% 
+    mutate(day_0_s = day_0 * 0.001)
+```
+You can then summarize() the day_0_s values, here by their minimum & maximum:
+
+```r
+sleep_study  %>% 
+    summarize(min(day_0_s), max(day_0_s))
+```
+
+```{r}
+sleep_study <- readr::read_csv('data/sleep_study.csv')
+```
+```{r}
+library(dplyr)
+```
+
+__Instructions__  
++ Check out the first 6 rows of sleep_study.
++ Define a new sleep_study variable diff_3, the day_3 minus the day_0 reaction times.
++ Use ggplot() with a geom_histogram() layer to construct a histogram of the diff_3 data.
++ summarize() the mean and standard deviation of the diff_3 observations.
+
+```{r}
+# Check out the first 6 rows of sleep_study
+sleep_study[1:6,]
+
+# Define diff_3
+sleep_study <- sleep_study %>% 
+    mutate(diff_3 = day_3 - day_0)
+ 
+# Histogram of diff_3    
+ggplot(sleep_study, aes(x = diff_3)) + 
+    geom_histogram(binwidth = 20, color = "white")
+
+# Mean and standard deviation of diff_3
+sleep_study %>% 
+    summarize(mean(diff_3), sd(diff_3))
+```
 
 
