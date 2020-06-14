@@ -56,8 +56,9 @@ $Y_i \sim N(m, s^2)$
 $m \sim N(50, 25^2)$
 $s \sim Unif(0,200)$
 
-```{r}
+```{r message=FALSE}
 library(ggplot2)
+library(rjags)
 ```
 
 
@@ -134,4 +135,69 @@ sleep_study %>%
 
 Reaction times increased by an average of ~26 ms with a standard deviation of ~37 ms. Further, only 4 of the 18 test subjects had faster reaction times on day 3 than on day 0. Though not in perfect agreement about the degree to which the average reaction time changes under sleep deprivation, both the likelihood and prior are consistent with the hypothesis that the average increases relative to reaction time under normal sleep conditions.
 
+### Define, compile, & simulate the Normal-Normal
+Upon observing the change in reaction time $Y_i$ for each of the 18 subjects $i$ enrolled in the sleep study, you can update your posterior model of the effect of sleep deprivation on reaction time. This requires the combination of insight from the likelihood and prior models:
+
++ likelihood: $Y_i \sim N(m, s^2)$
++ priors: $m \sim N(50, 25^2)$ and $s \sim Unif(0,200)$
+
+In this series of exercises, you'll __define__, __compile__, and __simulate__ your Bayesian posterior. 
+
+**Step 1: Define**
+DEFINE your Bayesian model and store the model string as `sleep_model`. In doing so, note that:
+
++ `dnorm(a, b)` defines a $N(a,b−1)$ model with precision (ie. inverse variance) $b$.
++ `dunif(a,b)` defines a $Unif(a,b)$ model.
++ The model of $Y_i$ depends upon $m$ and $s$. The number of subjects $i$ is defined by `length(Y)`.
+
+```{r}
+# DEFINE the model    
+sleep_model <- "model{
+    # Likelihood model for Y[i]
+    for(i in 1:length(Y)) {
+        Y[i] ~ dnorm(m, s^(-2))
+    }
+
+    # Prior models for m and s
+    m ~ dnorm(50, 25^(-2))
+    s ~ dunif(0, 200)
+}"
+```
+
+**Step 2: Compile**
+COMPILE sleep_model using jags.model():
+
++ Establish a `textConnection()` to `sleep_model` and provide the observed vector of `Y[i]` data from `sleep_study`. (Ignore `inits` for now!)
++ Store the output in a jags object named `sleep_jags`.
+
+```{r}
+# COMPILE the model
+sleep_jags <- jags.model(
+  textConnection(sleep_model),
+  data = list(Y = sleep_study$diff_3),
+  inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 1989)
+)
+```
+
+**Step 3: Simulate**
+SIMULATE a sample of 10,000 draws from the posterior model of $m$ and $s$
+
++ The required `coda.samples()` function takes 3 arguments: the compiled model, variable.names (the model parameter(s)), `n.iter` (sample size). Store this  `mcmc.list` in `sleep_sim`.
+
++ Construct a density `plot()` of the posterior samples in `sleep_sim`.
+
+```{r}
+# SIMULATE the posterior    
+sleep_sim <- coda.samples(model = sleep_jags, variable.names = c("m", "s"), n.iter = 10000)
+
+# PLOT the posterior    
+plot(sleep_sim, trace = FALSE)
+```
+
+
+Nice work!
+
+Your posterior model is more narrow and lies almost entirely above 0, thus you're more confident that the average reaction time increases under sleep deprivation. Further, the location of the posterior is below that of the prior. This reflects the strong insight from the observed sleep study data in which the increase in average reaction time was only ~26 ms.
+
+## Markov chains
 
