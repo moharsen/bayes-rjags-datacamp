@@ -3,7 +3,7 @@
     "path": "~/projects/bayes/bayesian_models_markov_chains.Rmd",
     "project_path": "bayesian_models_markov_chains.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "2173391804",
     "contents": "",
     "dirty": false,
     "created": 1592158016992.0,
@@ -11,16 +11,16 @@
     "relative_order": 2,
     "properties": {
         "tempName": "Untitled1",
-        "cursorPosition": "251,67",
-        "scrollLine": "231",
+        "cursorPosition": "283,0",
+        "scrollLine": "280",
         "last_setup_crc32": "7FD0DD56bb338d19"
     },
     "folds": "",
-    "lastKnownWriteTime": 1592175161,
+    "lastKnownWriteTime": 1592176581,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1592175161175,
+    "last_content_update": 1592176581456,
     "read_only": false,
     "read_only_alternatives": []
 }

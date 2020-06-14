@@ -251,5 +251,36 @@ ggplot(sleep_chains, aes(x = m)) +
 ```
 Remember, these plots _approximate_ the posterior models of m and s
 
+*Questions to consider*
+
++ What does a "good" Markov chain look like?
++ How accurate is the Markov chain approximation of the posterior?
++ For how many iterations should we run the Markov chain?
+
+### Multiple chains
+Trace plots help us diagnose the quality of a Markov chain simulation. A "good" Markov chain will exhibit stability as the chain length increases and consistency across repeated simulations, or multiple chains. You will use RJAGS to run and construct trace plots for four parallel chains below.
+
+**Instructions**
++ Use jags.model() to COMPILE sleep_model and initialize 4 parallel chains. Store the output in a jags object named sleep_jags_multi.
++ SIMULATE a sample of 1,000 draws from the posterior model of m and s. Store this mcmc.list in sleep_sim_multi.
++ Check out the head() of sleep_sim_multi. Note the 4 list items containing the 4 parallel chains.
++ Use plot() to construct trace plots for the multiple chains. Suppress the density plots.
+
+```{r}
+# COMPILE the model
+sleep_jags_multi <- jags.model(textConnection(sleep_model), data = list(Y = sleep_study$diff_3), n.chains = 4)   
+
+# SIMULATE the posterior    
+sleep_sim_multi <- coda.samples(model = sleep_jags_multi, variable.names = c("m", "s"), n.iter = 1000)
+
+# Check out the head of sleep_sim_multi
+head(sleep_sim_multi)
+
+# Construct trace plots of the m and s chains
+plot(sleep_sim_multi, density = FALSE)
+```
+The most important thing to notice here is the similarity and stability among the 4 parallel chains. This provides some reassurance about the quality and consistency of our Markov chain simulation
+
+
 
 
