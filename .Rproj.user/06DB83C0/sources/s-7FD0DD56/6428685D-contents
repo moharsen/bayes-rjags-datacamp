@@ -308,4 +308,32 @@ summary(sleep_sim_2)
 
 You've proved to yourself that if the standard errors associated with your Markov chain are too big, simply increase the number of iterations. In general, naive standard error will decrease as the chain length increases. 
 
+### Reproducibility
+
+Now that you've completed (and passed!) some Markov chain diagnostics, you're ready to finalize your RJAGS simulation. To this end, reproducibility is crucial. To obtain reproducible simulation output, you must set the seed of the RJAGS random number generator. This works differently than in base R. Instead of using set.seed(), you will specify a starting seed using 
+```r
+inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = ___) 
+```
+when you compile your model.
+
+**Instructions**
+
++ Run the provided code a few times. Notice that the summary() statistics change each time.
++ For reproducible results, supply the random number generator inits to jags.model(). Specify a starting seed of 1989.
++ Run the new code a few times. Notice that the summary() statistics do NOT change!
+
+```{r}
+# COMPILE the model
+sleep_jags <- jags.model(textConnection(sleep_model), 
+                         data = list(Y = sleep_study$diff_3),
+                         list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 1989)) 
+
+# SIMULATE the posterior    
+sleep_sim <- coda.samples(model = sleep_jags, variable.names = c("m", "s"), n.iter = 10000)
+
+# Summarize the m and s chains of sleep_sim
+summary(sleep_sim)
+```
+
+Chapter 2 completed.
 
