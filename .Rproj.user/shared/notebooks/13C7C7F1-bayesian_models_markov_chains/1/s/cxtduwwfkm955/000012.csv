@@ -1,4 +1,0 @@
-"0",""
-"0","# Mean and standard deviation of diff_3"
-"0","sleep_study %>% "
-"0","    summarize(mean(diff_3), sd(diff_3))"

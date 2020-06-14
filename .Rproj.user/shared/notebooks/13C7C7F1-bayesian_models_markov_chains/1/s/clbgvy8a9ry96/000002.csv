@@ -1,8 +1,0 @@
-"0","sleep_study <- readr::read_csv('data/sleep_study.csv')"
-"2","Parsed with column specification:
-cols(
-  subject = [32mcol_double()[39m,
-  day_0 = [32mcol_double()[39m,
-  day_3 = [32mcol_double()[39m
-)
-"

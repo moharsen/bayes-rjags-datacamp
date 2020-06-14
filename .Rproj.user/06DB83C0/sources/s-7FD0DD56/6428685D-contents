@@ -103,18 +103,17 @@ sleep_study  %>%
     summarize(min(day_0_s), max(day_0_s))
 ```
 
-```{r}
+```{r message=FALSE}
 sleep_study <- readr::read_csv('data/sleep_study.csv')
-```
-```{r}
 library(dplyr)
 ```
 
-__Instructions__  
-+ Check out the first 6 rows of sleep_study.
-+ Define a new sleep_study variable diff_3, the day_3 minus the day_0 reaction times.
-+ Use ggplot() with a geom_histogram() layer to construct a histogram of the diff_3 data.
-+ summarize() the mean and standard deviation of the diff_3 observations.
+__Instructions__
+
+* Check out the first 6 rows of sleep_study.
+* Define a new sleep_study variable diff_3, the day_3 minus the day_0 reaction times.
+* Use `ggplot()` with a geom_histogram() layer to construct a histogram of the diff_3 data.
+* `summarize()` the mean and standard deviation of the diff_3 observations.
 
 ```{r}
 # Check out the first 6 rows of sleep_study
@@ -133,4 +132,6 @@ sleep_study %>%
     summarize(mean(diff_3), sd(diff_3))
 ```
 
-Reaction times increased by an average of ~26 ms with a standard deviation of ~37 ms. Further, only 4 of the 18 test subjects had faster reaction times on day 3 than on day 0. 
+Reaction times increased by an average of ~26 ms with a standard deviation of ~37 ms. Further, only 4 of the 18 test subjects had faster reaction times on day 3 than on day 0. Though not in perfect agreement about the degree to which the average reaction time changes under sleep deprivation, both the likelihood and prior are consistent with the hypothesis that the average increases relative to reaction time under normal sleep conditions.
+
+
