@@ -174,21 +174,202 @@ weight_sim <- coda.samples(model = weight_jags, variable.names = c("a", "b", "s"
 plot(weight_sim)
 ```
 
-The results don't look that great. Let's fix that. 
+The results don't look that great. Let's fix that by increasing the number of simulations. 
 
 
 ```{r}
 # SIMULATE the posterior    
-weight_sim <- coda.samples(model = weight_jags, variable.names = c("a", "b", "s"), n.iter = 100000)
+weight_sim_big <- coda.samples(model = weight_jags, variable.names = c("a", "b", "s"), n.iter = 100000)
 
 # PLOT the posterior    
-plot(weight_sim)
+plot(weight_sim_big)
 ```
 
 Trace plots indicate that after only 1,000 iterations, the a and b parallel chains had not stabilized. However, after 100,000 iterations, the chains demonstrate greater stability. We might also increase the stability of our simulation by standardizing the height data.
 
+## Posterior point estimates
+
+Recall the likelihood of the Bayesian regression model of weight Y by height X: $Y_i \sim N(m_i, s^2)$ where $m_i =a+bX_i$. Load a dataframe with the contents of `weight_sim_big` markov chain output:
+
+```{r}
+weight_chains = data.frame(as.matrix(weight_sim_big[1]), iter = 1:100000)
+```
+
+The posterior means of the intercept & slope parameters, a & b, reflect the posterior mean trend in the relationship between weight & height. In contrast, the full posteriors of a & b reflect the range of plausible parameters, thus posterior uncertainty in the trend. You will examine the trend and uncertainty in this trend below. 
+
+**Instructions**
+
++ Obtain `summary()` statistics of the `weight_sim_big` chains.
++ The posterior mean of b is reported in Table 1 of the `summary()`. Use the raw `weight_chains` to verify this calculation.
++ Construct a scatterplot of the `wgt` vs `hgt` data in `bdims`. Use `geom_abline()` to superimpose the posterior mean trend.
++ Construct another scatterplot of `wgt` vs `hgt`. Superimpose the 20 regression lines defined by the first 20 sets of `a` & `b` parameter values in `weight_chains`.
+
+```{r}
+# Summarize the posterior Markov chains
+summary(weight_sim_big)
+
+# Calculate the estimated posterior mean of b
+mean(weight_chains$b)
+
+# Plot the posterior mean regression model
+ggplot(bdims, aes(x = hgt, y = wgt)) + 
+    geom_point() + 
+    geom_abline(intercept = mean(weight_chains$a), slope = mean(weight_chains$b), color = "red")
+
+# Visualize the range of 20 posterior regression models
+ggplot(bdims, aes(x = hgt, y = wgt)) + 
+    geom_point() + 
+    geom_abline(intercept = weight_chains$a[1:20], slope = weight_chains$b[1:20], color = "gray", size = 0.25)
+```
+
+Given the size of the data and selection of priors, the posterior uncertainty is noticeably small as evidenced by the tight distribution of the gray posterior plausible lines around the trend. 
+
+## Posterior credible intervals
+
+Let's focus on slope parameter $b$, the rate of change in weight over height. The posterior mean of $b$ reflects the trend in the posterior model of the slope. In contrast, a posterior credible interval provides a range of posterior plausible slope values, thus reflects posterior uncertainty about $b$. For example, the 95% credible interval for $b$ ranges from the 2.5th to the 97.5th quantile of the b posterior. Thus there's a 95% (posterior) chance that $b$ is in this range.
+
+You will use RJAGS simulation output to approximate credible intervals for $b$. 
+
+**Instructions**
+
++ Obtain `summary()` statistics of the weight_sim_big chains.
++ The 2.5% and 97.5% posterior quantiles for $b$ are reported in Table 2 of the `summary()`. Apply `quantile()` to the raw `weight_chains` to verify these calculations. Save this as `ci_95` and print it.
++ Similarly, use the `weight_chains` data to construct a 90% credible interval for $b$. Save this as `ci_90` and print it.
++ Construct a density plot of the b Markov chain values. Superimpose vertical lines representing the 90% credible interval for $b$ using `geom_vline()` with `xintercept = ci_90`.
+
+```{r}
+# Summarize the posterior Markov chains
+summary(weight_sim_big)
+
+# Calculate the 95% posterior credible interval for b
+ci_95 <- quantile(weight_chains$b, probs = c(0.025, 0.975))
+ci_95
+
+# Calculate the 90% posterior credible interval for b
+ci_90 <- quantile(weight_chains$b, probs = c(0.05, 0.95))
+ci_90
+
+# Mark the 90% credible interval 
+ggplot(weight_chains, aes(x = b)) + 
+    geom_density() + 
+    geom_vline(xintercept = ci_90, color = "red")
+```
+
+Based on your calculations we can say that there's a 90% (posterior) probability that, on average, the increase in weight per 1 cm increase in height is between 0.93 and 1.08 kg. 
+
+## Posterior probabilities
+
+You've used RJAGS output to explore and quantify the posterior trend & uncertainty $b$. You can also use RJAGS output to assess specific hypotheses. For example: What's the posterior probability that, on average, weight increases by more than 1.1 kg for every 1 cm increase in height? That is, what's the posterior probability that $b$>1.1?
+
+You will approximate this probability by the proportion of $b$
+Markov chain values that exceed 1.1. 
+
+**Instructions**
+
++ Construct a density plot of the $b$ Markov chain values and use `geom_vline()` to superimpose a vertical line at 1.1.
++ Use `table()` to summarize the number of $b$ Markov chain values that exceed 1.1.
++ Use `mean()` to calculate the proportion of $b$ Markov chain values that exceed 1.1.
+
+```{r}
+# Mark 1.1 on a posterior density plot for b
+ggplot(weight_chains, aes(x = b)) + 
+    geom_density() + 
+    geom_vline(xintercept = 1.1, color = "red")
+
+# Summarize the number of b chain values that exceed 1.1
+table(weight_chains$b>1.1)
+
+# Calculate the proportion of b chain values that exceed 1.1
+mean(weight_chains$b>1.1)
+```
+
+Based on the abve calculations we can say that there's only a ~2% (posterior) chance that, on average, the increase in weight per 1 cm increase in height exceeds 1.1 kg. 
+
+## Inference for the posterior trend
+In earlier exercises you approximated the form of the posterior trend m (solid line). From this, notice that the typical weight among 180 cm adults is roughly 80 kg. You will use RJAGS simulation output to approximate the posterior trend in weight among 180 cm tall adults as well as the posterior uncertainty in this trend. 
+
+**Instructions**
+
++ `weight_chains` contains 100,000 sets of posterior plausible parameter values of $a$ and $b$. From each, calculate the mean (typical) weight among 180 cm tall adults, `a + b * 180`. Store these trends as a new variable `m_180` in `weight_chains`.
+
++ Construct a posterior density plot of 100,000 `m_180` values.
+
++ Use the 100,000 `m_180` values to calculate a 95% posterior credible interval for the mean weight among 180 cm tall adults.
+
+```{r}
+# Calculate the trend under each Markov chain parameter set
+weight_chains <- weight_chains  %>% 
+    mutate(m_180 = a + b*180)
+
+# Construct a posterior density plot of the trend
+ggplot(weight_chains, aes(x = m_180)) + 
+    geom_density() 
+
+# Construct a posterior credible interval for the trend
+quantile(weight_chains$m_180, probs = c(0.025, 0.975))
+```
+
+The posterior trend of your regression model indicates that the typical weight among 180 cm tall adults is roughly 78 kg. However, posterior uncertainty in the regression model trickles down to uncertainty about this trend. This uncertainty is communicated through your credible interval: there's a 95% (posterior) chance that the typical weight at a height of 180 cm is between 76.95 and 79.24 kg. 
+
+## Calculating posterior predictions
+
+You just explored the posterior trend in weight Y among adults with height X=180: $m_{180}=a+b*180$. What if you wanted to predict the weight of a specific 180 cm tall adult? You can! To do so, you must account for individual variability from the trend, modeled by 
+
+$Y_{180} \sim N(m_{180}, s^2)$
+
+Using this model, you will simulate predictions of weight under each set of posterior plausible parameters in `weight_chains`.
+
+**Instructions**
+
+Use `rnorm()` to simulate a single prediction of weight under the parameter settings in the first row of `weight_chains`.
+Repeat the above using the parameter settings in the second row of `weight_chains`.
+Simulate a single prediction of weight under each of the 100,000 parameter settings in `weight_chains`. Store these as a new variable `Y_180` in `weight_chains`.
+Print the first 6 rows of parameter values & predictions in `weight_chains`.
+
+```{r}
+# Simulate 1 prediction under the first parameter set
+rnorm(n = 1, mean = weight_chains$m_180[1], sd = weight_chains$s[1])
+
+# Simulate 1 prediction under the second parameter set
+rnorm(n = 1, mean = weight_chains$m_180[2], sd = weight_chains$s[2])
+
+# Simulate & store 1 prediction under each parameter set
+weight_chains <- weight_chains  %>% 
+    mutate(Y_180 = rnorm(n = 100000, mean = weight_chains$m_180, sd = weight_chains$s))
+
+# Print the first 6 parameter sets & predictions
+head(weight_chains)
+```
+
+You will use these 100,000 predictions to approximate the posterior predictive distribution for the weight of a 180 cm tall adult. 
+
+__Instructions__
 
 
++ Use the 10,000 `Y_180` values to construct a 95% posterior credible interval for the weight of a 180 cm tall adult.
++ Construct a density plot of your 100,000 posterior plausible predictions.
++ Construct a scatterplot of the `wgt` vs `hgt` data in `bdims`.
+  + Use `geom_abline()` to superimpose the posterior regression trend.
+  + Use `geom_segment()` to superimpose a vertical line at a hgt of 180 that represents the lower & upper limits (`y` and `yend`) of `ci_180`.
+  
+```{r}
+# Construct a posterior credible interval for the prediction
+ci_180 <- quantile(weight_chains$Y_180, probs = c(0.025, 0.975))
+ci_180
+
+# Construct a density plot of the posterior predictions
+ggplot(weight_chains, aes(x = Y_180)) + 
+    geom_density() + 
+    geom_vline(xintercept = ci_180, color = "red")
+
+# Visualize the credible interval on a scatterplot of the data
+ggplot(bdims, aes(x = hgt, y = wgt)) + 
+    geom_point() + 
+    geom_abline(intercept = mean(weight_chains$a), slope = mean(weight_chains$b), color = "red") + 
+    geom_segment(x = 180, xend = 180, y = ci_180[1], yend = ci_180[2], color = "red")
+```
+
+Congratulations! You've simulated your first posterior predictive distribution. Your 100,000 posterior plausible weights for a given 180 cm tall adult ranged from roughly 36 to 117 kg. Eliminating the most extreme 5% of these predictions, you observed that there's a 95% (posterior) chance that the weight is between 72 and 84 kg. 
 
 
 
