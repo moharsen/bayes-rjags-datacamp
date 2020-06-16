@@ -1,0 +1,142 @@
+---
+title: "Multivariate and generalized linear models"
+author: "Mohar Sen"
+date: "6/15/2020"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chapter 4 goals
++ Incorporate categorical predictors into Bayesian models
++ Engineer multivariate Bayesian regression models
++ Extend our methodology for Normal regression models to generalized linear models: Poisson regression
+
+For starters, let's load the RailTrail dataframe from mosaic package
+
+```{r}
+library(rjags)
+library(ggplot2)
+library(mosaicData)
+data(RailTrail)
+```
+
+`RailTrail` contains data collected by the Pioneer Valley Planning Commission on the usage of a local rail-trail. For each of 90 days, they recorded the rail-trail `volume` (number of users) and whether it was a `weekday` (TRUE if yes and FALSE otherwise).
+
++ Confirm that `weekday` is recorded as a `factor` variable.
++ Construct density plots of weekday `volume` and weekend `volume` on the same frame.
+
+```{r}
+# Confirm that weekday is a factor variable
+class(RailTrail$weekday)
+
+# Construct a density plot of volume by weekday
+ggplot(RailTrail, aes(x = volume, fill = weekday)) + 
+    geom_density(alpha = 0.5)
+```
+
+## RJAGS simulation with categorical variables
+
+Consider the Normal regression model of volume $Y_i$ by weekday status $X_i$:
+
++ likelihood: $Y_i \sim N(m_i, s^2)$ where $m_i=a+bX_i$
++ priors: $a \sim N(400,100^2)$, $b\sim  N(0,200^2)$, $s \sim Unif(0,200)$
+
+
+You explored the relationship between $Y_i$ and $X_i$ for the 90 days recorded in RailTrail (in your workspace). In light of these data and the priors above, you will update your posterior model of this relationship. This differs from previous analyses in that $X_i$ is categorical. In rjags syntax, its coefficient b is defined by two elements, `b[1]` and `b[2]`, which correspond to the weekend and weekday levels, respectively. For reference, `b[1]` is set to 0. In contrast, `b[2]` is modeled by the prior for `b`.
+
+**Instructions 1/3**
+
+DEFINE your Bayesian model.
+
++ Define the likelihood model of `Y[i]` given `m[i]` and s where `m[i] <- a + b[X[i]]`. Note the new notation `b[X[i]]` here!
++ Specify the priors for `a`, `b` (via `b[1]` and `b[2]`), and `s`.
++ Store the model string as rail_model_1.
+
+```{r}
+# DEFINE the model    
+rail_model_1 <- "model{
+    # Likelihood model for Y[i]
+    for(i in 1:length(Y)) {
+      Y[i] ~ dnorm(m[i], s^(-2))
+      m[i] <- a + b[X[i]]
+    }
+
+    # Prior models for a, b, s
+    a ~ dnorm(400, 100^(-2))
+    b[1] <- 0
+    b[2] ~ dnorm(0, 200^(-2))
+    s ~ dunif(0, 200)
+}"
+```
+
+Solution
+
+```{r}
+# DEFINE the model
+rail_model_1 <- "model{
+      # Likelihood model for Y[i]
+      for(i in 1:length(Y)) {
+        Y[i] ~ dnorm(m[i], s^(-2))
+        m[i] <- a + b[X[i]]
+      }
+  
+      # Prior models for a, b, s
+      a ~ dnorm(400, 100^(-2))
+      s ~ dunif(0, 200)      
+      b[1] <- 0
+      b[2] ~ dnorm(0, 200^(-2))
+
+  }"
+```
+
+
+
+
+**Instructions 2/3**
+
+COMPILE rail_model_1 using jags.model():
+
++ Establish a `textConnection()` to `rail_model_1`.
++ Provide the observed `RailTrail` data.
++ Specify a starting random number generating seed of 10.
++ Store the output in a jags object named `rail_jags_1`.
+
+```{r}
+# COMPILE the model
+rail_jags_1 <- jags.model(
+  textConnection(rail_model_1),
+  data = list(Y = RailTrail$volume, X=RailTrail$weekday),
+  inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 10)
+)
+```
+
+**Instructions 3/3**
+
++ SIMULATE a sample of 10,000 draws from the posterior model of `a`, `b`, and `s`. Store this mcmc.list as `rail_sim_1`.
++ Store the Markov chain output in a data frame named `rail_chains_1`.
+`+ `plot()` the posterior samples in `rail_sim_1`.
+
+```{r}
+# COMPILE the model
+rail_jags_1 <- jags.model(
+  textConnection(rail_model_1),
+  data = list(Y = RailTrail$volume, X = RailTrail$weekday),
+  inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 10)
+)
+
+# SIMULATE the posterior    
+rail_sim_1 <- coda.samples(model = rail_jags_1, variable.names = c("a", "b", "s"), n.iter = 10000)
+
+# Store the chains in a data frame
+rail_chains_1 <- data.frame(rail_sim_1[[1]])
+
+# PLOT the posterior
+plot(rail_sim_1)
+```
+
+
