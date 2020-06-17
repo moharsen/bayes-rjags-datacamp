@@ -2,7 +2,7 @@
 title: "Multivariate and generalized linear models"
 author: "Mohar Sen"
 date: "6/15/2020"
-output: pdf_document
+output: html_document
 editor_options: 
   chunk_output_type: console
 ---
