@@ -74,29 +74,6 @@ rail_model_1 <- "model{
 }"
 ```
 
-Solution
-
-```{r}
-# DEFINE the model
-rail_model_1 <- "model{
-      # Likelihood model for Y[i]
-      for(i in 1:length(Y)) {
-        Y[i] ~ dnorm(m[i], s^(-2))
-        m[i] <- a + b[X[i]]
-      }
-  
-      # Prior models for a, b, s
-      a ~ dnorm(400, 100^(-2))
-      s ~ dunif(0, 200)      
-      b[1] <- 0
-      b[2] ~ dnorm(0, 200^(-2))
-
-  }"
-```
-
-
-
-
 **Instructions 2/3**
 
 COMPILE rail_model_1 using jags.model():
@@ -110,10 +87,12 @@ COMPILE rail_model_1 using jags.model():
 # COMPILE the model
 rail_jags_1 <- jags.model(
   textConnection(rail_model_1),
-  data = list(Y = RailTrail$volume, X=RailTrail$weekday),
+  data = list(Y = RailTrail$volume, X = factor(RailTrail$weekday)),
   inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 10)
 )
 ```
+
+Note: the compilation step was throwing an error, which was solved by the response as shown in this stackoverflow question.
 
 **Instructions 3/3**
 
@@ -122,13 +101,6 @@ rail_jags_1 <- jags.model(
 `+ `plot()` the posterior samples in `rail_sim_1`.
 
 ```{r}
-# COMPILE the model
-rail_jags_1 <- jags.model(
-  textConnection(rail_model_1),
-  data = list(Y = RailTrail$volume, X = RailTrail$weekday),
-  inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 10)
-)
-
 # SIMULATE the posterior    
 rail_sim_1 <- coda.samples(model = rail_jags_1, variable.names = c("a", "b", "s"), n.iter = 10000)
 
@@ -138,5 +110,14 @@ rail_chains_1 <- data.frame(rail_sim_1[[1]])
 # PLOT the posterior
 plot(rail_sim_1)
 ```
+
+**Interpreting coefficients**
+
+```{r}
+summary(rail_sim_1)
+```
+
+
+We see that typically, there are ~428 trail users on a weekend day and ~78 fewer users on a weekday. Exact number may vary depending on the time of generation of this document.
 
 
