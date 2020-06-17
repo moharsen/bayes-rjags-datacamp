@@ -120,4 +120,13 @@ summary(rail_sim_1)
 
 We see that typically, there are ~428 trail users on a weekend day and ~78 fewer users on a weekday. Exact number may vary depending on the time of generation of this document.
 
+## Inference for volume by weekday
+
+You will utilize these simulation data to make inferences about weekday trail volume.
+
+**Instructions**
+
++ Combine the `a` and `b.2`. chain values to construct a chain of 10,000 values for the typical weekday trail volume. Store this as `weekday_mea`n in `rail_chains_1`.
++ Use `ggplot()` to construct a density plot of the `weekday_mean` chain values.
++ Construct a 95% credible interval for the typical weekday trail volume.
 
